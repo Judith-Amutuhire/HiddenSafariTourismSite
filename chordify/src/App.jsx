@@ -13,6 +13,7 @@ import TermsAndConditionsPage from './components/pages/TermsAndConditionsPage';
 import PrivacyPolicyPage from './components/pages/PrivacyPolicyPage';
 import Footer from './components/Footer';
 import './App.css';
+import DetailsPage from './components/pages/DetailsPage';
 // Component that uses the auth context
 function AppContent() {
   const { isAuthenticated, setIsAuthenticated } = useAuth();
@@ -32,6 +33,7 @@ function AppContent() {
             <Route path="/profile" element={<ProfilePage isAuthenticated={isAuthenticated} />} />
             <Route path="/terms" element={<TermsAndConditionsPage />} />
             <Route path="/privacy" element={<PrivacyPolicyPage />} />
+            <Route path="/details" element={<DetailsPage/>} />
           </Routes>
         </div>
         <Footer />

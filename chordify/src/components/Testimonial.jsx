@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Star } from "lucide-react";
+import { Star, StarHalf, Star as StarEmpty } from "lucide-react";
 import "../App.css";
 
 export default function Testimonial({ testimonials }) {
@@ -34,7 +34,7 @@ export default function Testimonial({ testimonials }) {
               onClick={() => setSelectedIndex(index)}
             >
               <img
-                src={person.image}
+                src={person.profileImage}
                 alt={person.name}
                 className="w-14 h-14 rounded-full object-cover"
               />
@@ -57,18 +57,47 @@ export default function Testimonial({ testimonials }) {
         {/* Testimonial Display */}
         <div className="md:w-2/3 mt-6 md:mt-0 md:pl-6">
           <div className="flex items-center mb-4">
-            {[...Array(testimonials[selectedIndex].rating)].map((_, i) => (
-              <Star
-                key={i}
-                className="text-yellow-400 mr-1"
-                fill="currentColor"
-                stroke="none"
-                size={20}
-              />
-            ))}
+            {[...Array(5)].map((_, i) => {
+              const rating = testimonials[selectedIndex].ratings;
+
+              if (i < Math.floor(rating)) {
+                // Full star
+                return (
+                  <Star
+                    key={i}
+                    className="text-yellow-400 mr-1"
+                    fill="currentColor"
+                    stroke="none"
+                    size={20}
+                  />
+                );
+              } else if (i === Math.floor(rating) && rating % 1 >= 0.5) {
+                // Half star
+                return (
+                  <StarHalf
+                    key={i}
+                    className="text-yellow-400 mr-1"
+                    fill="currentColor"
+                    stroke="none"
+                    size={20}
+                  />
+                );
+              } else {
+                // Empty star (unfilled star)
+                return (
+                  <StarEmpty
+                    key={i}
+                    className="text-gray-300 mr-1"
+                    fill="none"
+                    stroke="currentColor"
+                    size={20}
+                  />
+                );
+              }
+            })}
           </div>
           <p className="text-gray-700 text-lg">
-            {testimonials[selectedIndex].testimonial}
+            {testimonials[selectedIndex].review}
           </p>
         </div>
       </div>

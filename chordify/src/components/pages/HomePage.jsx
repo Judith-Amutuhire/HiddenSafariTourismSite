@@ -2,171 +2,103 @@ import HeroSection from "../HeroSection";
 import Card1 from "../Card1";
 import Card2 from "../Card2";
 import Video from "../Video";
-import CardCarousel  from "../CardCarousel";
-import { useState } from "react";
+import CardCarousel from "../CardCarousel";
+import { useState, useEffect } from "react";
 import * as images from "/src/assets";
-import Testimonial from '../Testimonial.jsx'
+import Testimonial from "../Testimonial.jsx";
 
 export default function HomePage() {
-  const [highlightedEvents, setHighlightedEvents] = useState([
-    { id: 1, image: images.kilimanjaro, title: "Kilimanjaro" },
-    { id: 2, image: images.madagascar, title: "Madagascar" },
-    { id: 3, image: images.capeTown, title: "Cape Town" },
-    { id: 4, image: images.kilimanjaro, title: "Kilimanjaro" },
-    { id: 5, image: images.madagascar, title: "Madagascar" },
-    { id: 6, image: images.capeTown, title: "Cape Town" },
-    { id: 7, image: images.kilimanjaro, title: "Kilimanjaro" },
-    { id: 8, image: images.madagascar, title: "Madagascar" },
-    { id: 9, image: images.capeTown, title: "Cape Town" },
-  ]);
-  const [snowTreks, setSnowTreks] = useState([
-    {
-      id: 1,
-      title: "KILIMANJARO",
-      location: "Killmanjaro Trek",
-      image: images.kilimanjaro,
-    },
-    {
-      id: 2,
-      title: "KILIMANJARO",
-      location: "Killmanjaro Trek",
-      image: images.kilimanjaro,
-    },{
-      id: 3,
-      title: "KILIMANJARO",
-      location: "Killmanjaro Trek",
-      image: images.kilimanjaro,
-    },{
-      id: 4,
-      title: "KILIMANJARO",
-      location: "Killmanjaro Trek",
-      image: images.kilimanjaro,
-    },{
-      id: 5,
-      title: "KILIMANJARO",
-      location: "Killmanjaro Trek",
-      image: images.kilimanjaro,
-    },{
-      id: 6,
-      title: "KILIMANJARO",
-      location: "Killmanjaro Trek",
-      image: images.kilimanjaro,
-    },{
-      id: 7,
-      title: "KILIMANJARO",
-      location: "Killmanjaro Trek",
-      image: images.kilimanjaro,
-    },
-  ]);
-  const [summerEvents, setSummerEvents] = useState([
-    {
-      id: 1,
-      title: "KRUGER PARK",
-      location: "Kruger Park",
-      image: images.kruger,
-    },
-    {
-      id: 2,
-      title: "WESTERN CAPE",
-      location: "Western Cape",
-      image: images.westernCape,
-    },
-    {
-      id: 3,
-      title: "ADDO PARK",
-      location: "Addo Park",
-      image: images.addoPark,
-    },
-    {
-      id: 4,
-      title: "MASAI MARA",
-      location: "Masai Mara",
-      image: images.masaiMara,
-    },
-    {
-      id: 5,
-      title: "KRUGER PARK",
-      location: "Kruger Park",
-      image: images.kruger,
-    },
-    {
-      id: 6,
-      title: "WESTERN CAPE",
-      location: "Western Cape",
-      image: images.westernCape,
-    },
-    {
-      id: 7,
-      title: "ADDO PARK",
-      location: "Addo Park",
-      image: images.addoPark,
-    },
-    {
-      id: 8,
-      title: "MASAI MARA",
-      location: "Masai Mara",
-      image: images.masaiMara,
-    },
-  ]);    // Set authentication state
-  const [epicAdventure, setEpicAdventure] = useState([
-    {
-      id: 1,
-      title: "KILIMANJARO",
-      location: "Kilimanjaro Trek",
-      image: images.kilimanjaro,
-    },
-    {
-      id: 2,
-      title: "HWANGE PARK",
-      location: "Hwange Park",
-      image: images.hwangePark,
-    },
-    { id: 3, title: "BOTSWANA", location: "Botswana", image: images.botswana },
-    {
-      id: 4,
-      title: "KILIMANJARO",
-      location: "Kilimanjaro Trek",
-      image: images.kilimanjaro,
-    },
-    {
-      id: 5,
-      title: "HWANGE PARK",
-      location: "Hwange Park",
-      image: images.hwangePark,
-    },
-    { id: 6, title: "BOTSWANA", location: "Botswana", image: images.botswana },
-  ]);
-  const [specialEvents, setSpecialEvents] = useState([
-    { id: 1, title: "HUNTING", location: "Hunting", image: images.hunting },
-    {
-      id: 2,
-      title: "TRAINING CAMP",
-      location: "Training Camp",
-      image: images.trainingCamp,
-    },
-    { id: 3, title: "HUNTING", location: "Hunting", image: images.hunting },
-    {
-      id: 4,
-      title: "TRAINING CAMP",
-      location: "Training Camp",
-      image: images.trainingCamp,
-    },
-    { id: 5, title: "HUNTING", location: "Hunting", image: images.hunting },
-    {
-      id: 6,
-      title: "TRAINING CAMP",
-      location: "Training Camp",
-      image: images.trainingCamp,
-    },
-    { id: 7, title: "HUNTING", location: "Hunting", image: images.hunting },
-    {
-      id: 8,
-      title: "TRAINING CAMP",
-      location: "Training Camp",
-      image: images.trainingCamp,
-    },
-    
-  ]);
+  const [highlightedEvents, setHighlightedEvents] = useState([]);
+
+  useEffect(() => {
+    fetch("http://54.210.95.246:3005/api/v1/events/highlighted-events")
+      .then((res) => res.json())
+      .then((data) => {
+        const formatted = data.map((event, index) => ({
+          id: event.id || index,
+          title: event.heading || "Untitled",
+          location: event.heading || "Unknown",
+          image: event.bannerImages1 || images.kilimanjaro,
+        }));
+        setHighlightedEvents(formatted);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch highlighted Events", err);
+      });
+  }, []);
+  const [snowTreks, setSnowTreks] = useState([]);
+
+  useEffect(() => {
+    fetch("http://54.210.95.246:3005/api/v1/events/snow-treks-events")
+      .then((res) => res.json())
+      .then((data) => {
+        const formatted = data.map((event, index) => ({
+          id: event.id || index,
+          title: event.heading || "Untitled",
+          location: event.heading || "Unknown",
+          image: event.bannerImages1 || images.kilimanjaro,
+        }));
+        setSnowTreks(formatted);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch snow treks", err);
+      });
+  }, []);
+  const [summerEvents, setSummerEvents] = useState([]);
+
+  useEffect(() => {
+    fetch("http://54.210.95.246:3005/api/v1/events/summer-events")
+      .then((res) => res.json())
+      .then((data) => {
+        const formatted = data.map((event, index) => ({
+          id: event.id || index,
+          title: event.heading || "Untitled",
+          location: event.heading || "Unknown",
+          image: event.bannerImages1 || images.kilimanjaro,
+        }));
+        setSummerEvents(formatted);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch summer Events", err);
+      });
+  }, []);
+  const [epicAdventure, setEpicAdventure] = useState([]);
+
+  useEffect(() => {
+    fetch("http://54.210.95.246:3005/api/v1/events/epic-adventure-events")
+      .then((res) => res.json())
+      .then((data) => {
+        const formatted = data.map((event, index) => ({
+          id: event.id || index,
+          title: event.heading || "Untitled",
+          location: event.heading || "Unknown",
+          image: event.bannerImages1 || images.kilimanjaro,
+        }));
+        setEpicAdventure(formatted);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch Epic Adventure", err);
+      });
+  }, []);
+  // Special Events
+  const [specialEvents, setSpecialEvents] = useState([]);
+
+  useEffect(() => {
+    fetch("http://54.210.95.246:3005/api/v1/events/special-events")
+      .then((res) => res.json())
+      .then((data) => {
+        const formatted = data.map((event, index) => ({
+          id: event.id || index,
+          title: event.heading || "Untitled",
+          location: event.heading || "Unknown",
+          image: event.bannerImages1 || images.kilimanjaro,
+        }));
+        setSpecialEvents(formatted);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch special events", err);
+      });
+  }, []);
   const [youTubeVideos, setYouTubeVideos] = useState([
     {
       id: 1,
@@ -199,33 +131,21 @@ export default function HomePage() {
       link: "https://youtu.be/qYu7L08GV0k?si=ti8DD2NFHZiqpD-P",
     },
   ]);
-  const testimonials = [
-    {
-      name: "Milton Austin",
-      role: "Sales Manager, ABC",
-      image: images.milton,
-      rating: 5,
-      testimonial:
-        "This trekking organization is excellent. Their costs are minimal due to their NGO’s non-profit efforts. You can have the experience of trekking at the lowest cost with basic amenities and the best available trek leaders. The best part is the food they provide during the trek. Their cooks are the best I have experienced so far with different organizations. The food they serve is healthy and a balan.",
-    },
-    {
-      name: "Annie",
-      role: "Head of Sales, ABC",
-      image: images.annie,
-      rating: 5,
-      testimonial:
-        "Amazing experience! The team was supportive and well-organized throughout. Highly recommend this for first-time trekkers.",
-    },
-    {
-      name: "Sandra",
-      role: "Head of Sales, ABC",
-      image: images.sandra,
-      rating: 4,
-      testimonial:
-        "Very efficient service, and the food provided was very healthy and balanced. Will definitely book again.",
-    },
-  ];
+  const [testimonials, setTestimonials] = useState([]);
+  const [loadingTestimonials, setLoadingTestimonials] = useState(true);
 
+  useEffect(() => {
+    fetch("http://54.210.95.246:3005/api/v1/info/testimonials")
+      .then((res) => res.json())
+      .then((data) => {
+        setTestimonials(data);
+        setLoadingTestimonials(false);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch testimonials", err);
+        setLoadingTestimonials(false);
+      });
+  }, []);
   return (
     <div className="">
       <HeroSection />
@@ -238,7 +158,12 @@ export default function HomePage() {
         </p>
         <CardCarousel>
           {highlightedEvents.map((event) => (
-            <Card1 key={event.id} image={event.image} title={event.title} />
+            <Card1
+              key={event.id}
+              id={event.id}
+              image={event.image}
+              title={event.title}
+            />
           ))}
         </CardCarousel>
       </div>
@@ -252,6 +177,7 @@ export default function HomePage() {
           {snowTreks.map((event) => (
             <div key={event.id} className="flex-shrink-0 w-64 md:w-72">
               <Card2
+                id={event.id}
                 image={event.image}
                 title={event.title}
                 location={event.location}
@@ -273,6 +199,7 @@ export default function HomePage() {
           {summerEvents.map((event) => (
             <div key={event.id} className="flex-shrink-0 w-64 md:w-72">
               <Card2
+                id={event.id}
                 image={event.image}
                 title={event.title}
                 location={event.location}
@@ -294,6 +221,7 @@ export default function HomePage() {
           {epicAdventure.map((event) => (
             <div key={event.id} className="flex-shrink-0 w-64 md:w-72">
               <Card2
+                id={event.id}
                 image={event.image}
                 title={event.title}
                 location={event.location}
@@ -316,6 +244,7 @@ export default function HomePage() {
           {specialEvents.map((event) => (
             <div key={event.id} className="flex-shrink-0 w-64 md:w-72">
               <Card2
+                id={event.id}
                 image={event.image}
                 title={event.title}
                 location={event.location}
@@ -337,6 +266,7 @@ export default function HomePage() {
           {youTubeVideos.map((video) => (
             <div key={video.id} className="flex-shrink-0 w-64 md:w-72">
               <Video
+                id={video.id}
                 image={video.image}
                 link={video.link}
                 altText={video.title || "YouTube video thumbnail"}
@@ -346,8 +276,11 @@ export default function HomePage() {
           ))}
         </CardCarousel>
       </div>
-      {/* Testimonials */}
-      <Testimonial testimonials={testimonials} />
+      {loadingTestimonials ? (
+        <p className="text-center py-8">Loading testimonials...</p>
+      ) : (
+        <Testimonial testimonials={testimonials} />
+      )}
     </div>
   );
 }

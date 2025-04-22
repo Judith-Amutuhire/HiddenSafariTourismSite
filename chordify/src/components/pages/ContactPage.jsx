@@ -1,4 +1,56 @@
+import { useEffect, useState } from 'react';
+
 export default function ContactPage() {
+  const [offices, setOffices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchContactData = async () => {
+      try {
+        setLoading(true);
+        console.log("Fetching contact data...");
+        
+        const response = await fetch('http://54.210.95.246:3005/api/v1/contact');
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch contact data: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log("API Response:", data);
+        
+        // Check if data is in the expected format
+        if (Array.isArray(data)) {
+          setOffices(data);
+        } else if (data && Array.isArray(data.data)) {
+          // Handle if the response has a data property containing the array
+          setOffices(data.data);
+        } else {
+          throw new Error("Unexpected API response format");
+        }
+      } catch (err) {
+        console.error("Error fetching contact data:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchContactData();
+  }, []);
+
+  // Function to format address from a single string
+  const formatAddress = (addressString) => {
+    // Split the address into parts for better display
+    const parts = addressString.split(',');
+    
+    // Return formatted address parts as separate elements
+    return parts.map((part, index) => (
+      <p key={index} className="mb-1">{part.trim()}</p>
+    ));
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Orange header section with title and quote */}
@@ -11,107 +63,46 @@ export default function ContactPage() {
 
       {/* Main content with office cards */}
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Office 1 Card */}
-          <div className="bg-red-50 p-6 rounded-lg shadow-sm border border-gray-100">
-            <h2 className="text-2xl font-bold mb-4">Office 1(Head Office)</h2>
-            <p className="mb-1">308, University, Above Chocolate Room,</p>
-            <p className="mb-1">ABC Cross Roads, XYZ,</p>
-            <p className="mb-4">XXX, - 3X00X9</p>
-            
-            <p className="mb-4">Office Timings: 11AM to 8PM</p>
-            
-            <div className="space-y-2 mb-4">
-              <p className="flex items-center text-orange-600">
-                <span className="mr-2">📞</span> +91-XXX6475XXX
-              </p>
-              <p className="flex items-center text-orange-600">
-                <span className="mr-2">📞</span> +91-XXX6475XXX
-              </p>
-            </div>
-            
-            <div className="text-right">
-              <a href="#" className="text-orange-600 inline-flex items-center">
-                View On Map <span className="ml-1">↗</span>
-              </a>
-            </div>
+        {loading && <p className="text-center text-lg">Loading contact information...</p>}
+        
+        {error && (
+          <div className="text-center text-red-500 mb-6">
+            <p>Error: {error}</p>
+            <p className="mt-2 text-sm">Please try again later.</p>
           </div>
-
-          {/* Office 2 Card */}
-          <div className="bg-red-50 p-6 rounded-lg shadow-sm border border-gray-100">
-            <h2 className="text-2xl font-bold mb-4">Office 2</h2>
-            <p className="mb-1">308, University, Above Chocolate Room,</p>
-            <p className="mb-1">ABC Cross Roads, XYZ,</p>
-            <p className="mb-4">XXX, - 3X00X9</p>
-            
-            <p className="mb-4">Office Timings: 11AM to 8PM</p>
-            
-            <div className="space-y-2 mb-4">
-              <p className="flex items-center text-orange-600">
-                <span className="mr-2">📞</span> +91-XXX6475XXX
-              </p>
-              <p className="flex items-center text-orange-600">
-                <span className="mr-2">📞</span> +91-XXX6475XXX
-              </p>
-            </div>
-            
-            <div className="text-right">
-              <a href="#" className="text-orange-600 inline-flex items-center">
-                View On Map <span className="ml-1">↗</span>
-              </a>
-            </div>
+        )}
+        
+        {!loading && !error && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {offices.length > 0 ? (
+              offices.map((office, index) => (
+                <div key={index} className="bg-red-50 p-6 rounded-lg shadow-sm border border-gray-100">
+                  <h2 className="text-2xl font-bold mb-4">{office.name}</h2>
+                  
+                  {formatAddress(office.address)}
+                  
+                  <p className="mb-4">Office Timings: {office.office_timings}</p>
+                  
+                  <div className="space-y-2 mb-4">
+                    {office.contact_numbers && office.contact_numbers.map((number, idx) => (
+                      <p key={idx} className="flex items-center text-orange-600">
+                        <span className="mr-2">📞</span> {number}
+                      </p>
+                    ))}
+                  </div>
+                  
+                  <div className="text-right">
+                    <a href="#" className="text-orange-600 inline-flex items-center">
+                      View On Map <span className="ml-1">↗</span>
+                    </a>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="col-span-2 text-center text-lg">No office locations found.</p>
+            )}
           </div>
-
-          {/* Office 3 Card */}
-          <div className="bg-red-50 p-6 rounded-lg shadow-sm border border-gray-100">
-            <h2 className="text-2xl font-bold mb-4">Office 3</h2>
-            <p className="mb-1">308, University, Above Chocolate Room,</p>
-            <p className="mb-1">ABC Cross Roads, XYZ,</p>
-            <p className="mb-4">XXX, - 3X00X9</p>
-            
-            <p className="mb-4">Office Timings: 11AM to 8PM</p>
-            
-            <div className="space-y-2 mb-4">
-              <p className="flex items-center text-orange-600">
-                <span className="mr-2">📞</span> +91-XXX6475XXX
-              </p>
-              <p className="flex items-center text-orange-600">
-                <span className="mr-2">📞</span> +91-XXX6475XXX
-              </p>
-            </div>
-            
-            <div className="text-right">
-              <a href="#" className="text-orange-600 inline-flex items-center">
-                View On Map <span className="ml-1">↗</span>
-              </a>
-            </div>
-          </div>
-
-          {/* Office 4 Card */}
-          <div className="bg-red-50 p-6 rounded-lg shadow-sm border border-gray-100">
-            <h2 className="text-2xl font-bold mb-4">Office 4</h2>
-            <p className="mb-1">308, University, Above Chocolate Room,</p>
-            <p className="mb-1">ABC Cross Roads, XYZ,</p>
-            <p className="mb-4">XXX, - 3X00X9</p>
-            
-            <p className="mb-4">Office Timings: 11AM to 8PM</p>
-            
-            <div className="space-y-2 mb-4">
-              <p className="flex items-center text-orange-600">
-                <span className="mr-2">📞</span> +91-XXX6475XXX
-              </p>
-              <p className="flex items-center text-orange-600">
-                <span className="mr-2">📞</span> +91-XXX6475XXX
-              </p>
-            </div>
-            
-            <div className="text-right">
-              <a href="#" className="text-orange-600 inline-flex items-center">
-                View On Map <span className="ml-1">↗</span>
-              </a>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
       
       {/* Footer is already included separately */}

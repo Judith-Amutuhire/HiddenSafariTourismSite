@@ -1,47 +1,120 @@
+import { useEffect, useState } from 'react';
+
 export default function PrivacyPolicyPage() {
-    return (
-      <div className="flex flex-col min-h-screen">
-        {/* Orange background header area that extends full width */}
-        <div className="bg-orange-600 text-white w-full">
-          {/* Content area with proper padding - navbar would be above this */}
-          <div className="container mx-auto px-4 pt-20 pb-10">
-            <h1 className="text-4xl font-bold mb-2">Privacy policy</h1>
-            <p className="text-xl">Meet the heroes behind our Success</p>
-          </div>
-        </div>
-  
-        {/* Main content area with white background */}
-        <div className="container mx-auto px-4 py-10 bg-white">
-          <div className="max-w-4xl">
-            <section className="mb-8">
-              <h2 className="text-2xl font-medium text-orange-800 mb-4">Guarantee of confidentiality</h2>
-              <p className="text-gray-800 text-lg">
-                We are committed to protecting your privacy online. Our privacy policy is
-                designed to give you peace of mind and confidence. We may change this policy
-                from time to time by updating this page and you should check this page to
-                ensure that you are happy with any changes. This policy is effective from 1st of
-                December 2021 onwards.
-              </p>
-            </section>
-  
-            <section className="mb-8">
-              <h2 className="text-2xl font-medium text-orange-800 mb-4">Cookie usage</h2>
-              <p className="text-gray-800 text-lg">
-                We use cookies on our website for a variety of reasons. Cookies help us identify
-                the device you are using and how you use our website, but not you personally.
-                Cookies record anonymous information about visits and clicks on each webpage.
-                Cookies are small files which are stored on your computer when you visit a
-                website. However, they cannot be used to identify you personally and they are
-                not harmful to your computer. They are essential for several features of our
-                website to work, they help us to identify which pages are being used, and to
-                analyse data and improve our site. We use this information for statistical analysis
-                purposes only and they in no way give us any information about you. If you
-                choose, you can opt out by turning off cookies in the preferences settings in your
-                web browser.
-              </p>
-            </section>
-          </div>
+  const [policyData, setPolicyData] = useState({
+    title: "Privacy Policy",
+    content: ""
+  });
+  const [sections, setSections] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchPrivacyPolicy = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://54.210.95.246:3005/api/v1/info/privacy-policy');
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch privacy policy: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log("API Response:", data);
+        
+        // Store the full policy data
+        setPolicyData(data);
+        
+        // Process the content to extract sections
+        if (data && data.content) {
+          // Process content into sections
+          const processedSections = processContent(data.content);
+          setSections(processedSections);
+        } else {
+          throw new Error("Content not found in API response");
+        }
+      } catch (err) {
+        console.error("Error fetching privacy policy:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPrivacyPolicy();
+  }, []);
+
+  // Function to process content into sections
+  const processContent = (content) => {
+    // Split the content by section headings followed by colon
+    const sectionRegex = /\n([^:\n]+):/g;
+    const sectionMatches = [...content.matchAll(sectionRegex)];
+    
+    const processedSections = [];
+    
+    if (sectionMatches.length > 0) {
+      // Process each found section
+      for (let i = 0; i < sectionMatches.length; i++) {
+        const currentMatch = sectionMatches[i];
+        const nextMatch = sectionMatches[i + 1];
+        
+        const title = currentMatch[1].trim();
+        const startIndex = currentMatch.index + currentMatch[0].length;
+        const endIndex = nextMatch ? nextMatch.index : content.length;
+        
+        const sectionContent = content.substring(startIndex, endIndex).trim();
+        
+        processedSections.push({
+          title,
+          content: sectionContent
+        });
+      }
+    } else {
+      // If no sections found, use the whole content as one section
+      processedSections.push({
+        title: "Privacy Policy",
+        content: content.trim()
+      });
+    }
+    
+    return processedSections;
+  };
+
+  return (
+    <div className="flex flex-col min-h-screen">
+      {/* Orange background header area that extends full width */}
+      <div className="bg-orange-600 text-white w-full">
+        {/* Content area with proper padding - navbar would be above this */}
+        <div className="container mx-auto px-4 pt-20 pb-10">
+          <h1 className="text-4xl font-bold mb-2">{policyData.title}</h1>
+          <p className="text-xl">Our commitment to your privacy</p>
         </div>
       </div>
-    );
-  }
+
+      {/* Main content area with white background */}
+      <div className="container mx-auto px-4 py-10 bg-white">
+        {loading && <p className="text-center text-lg">Loading privacy policy...</p>}
+        
+        {error && (
+          <div className="text-center text-red-500 mb-6">
+            <p>Error: {error}</p>
+            <p className="mt-2 text-sm">Please try again later.</p>
+          </div>
+        )}
+        
+        {!loading && !error && (
+          <div className="max-w-4xl">
+            {sections.map((section, index) => (
+              <section key={index} className="mb-8">
+                <h2 className="text-2xl font-medium text-orange-800 mb-4">{section.title}</h2>
+                <p className="text-gray-800 text-lg">
+                  {section.content}
+                </p>
+              </section>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

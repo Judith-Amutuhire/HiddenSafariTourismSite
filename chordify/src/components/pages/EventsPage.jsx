@@ -11,7 +11,7 @@ export default function EventsPage() {
   useEffect(() => {
     const endpoints = [
       'highlighted-events',
-      'snow-treks-event',
+      'snow-treks-events',
       'summer-events',
       'epic-adventure-events',
       'special-events',

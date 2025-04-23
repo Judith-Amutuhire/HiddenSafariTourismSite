@@ -9,9 +9,10 @@ import Testimonial from "../Testimonial.jsx";
 
 export default function HomePage() {
   const [highlightedEvents, setHighlightedEvents] = useState([]);
+  const URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
-    fetch("http://54.210.95.246:3005/api/v1/events/highlighted-events")
+    fetch(`${URL}events/highlighted-events`)
       .then((res) => res.json())
       .then((data) => {
         const formatted = data.map((event, index) => ({
@@ -29,7 +30,7 @@ export default function HomePage() {
   const [snowTreks, setSnowTreks] = useState([]);
 
   useEffect(() => {
-    fetch("http://54.210.95.246:3005/api/v1/events/snow-treks-events")
+    fetch(`${URL}events/snow-treks-events`)
       .then((res) => res.json())
       .then((data) => {
         const formatted = data.map((event, index) => ({
@@ -47,7 +48,7 @@ export default function HomePage() {
   const [summerEvents, setSummerEvents] = useState([]);
 
   useEffect(() => {
-    fetch("http://54.210.95.246:3005/api/v1/events/summer-events")
+    fetch(`${URL}events/summer-events`)
       .then((res) => res.json())
       .then((data) => {
         const formatted = data.map((event, index) => ({
@@ -65,7 +66,7 @@ export default function HomePage() {
   const [epicAdventure, setEpicAdventure] = useState([]);
 
   useEffect(() => {
-    fetch("http://54.210.95.246:3005/api/v1/events/epic-adventure-events")
+    fetch(`${URL}events/epic-adventure-events`)
       .then((res) => res.json())
       .then((data) => {
         const formatted = data.map((event, index) => ({
@@ -84,7 +85,7 @@ export default function HomePage() {
   const [specialEvents, setSpecialEvents] = useState([]);
 
   useEffect(() => {
-    fetch("http://54.210.95.246:3005/api/v1/events/special-events")
+    fetch(`${URL}events/special-events`)
       .then((res) => res.json())
       .then((data) => {
         const formatted = data.map((event, index) => ({
@@ -135,7 +136,7 @@ export default function HomePage() {
   const [loadingTestimonials, setLoadingTestimonials] = useState(true);
 
   useEffect(() => {
-    fetch("http://54.210.95.246:3005/api/v1/info/testimonials")
+    fetch(`${URL}info/testimonials`)
       .then((res) => res.json())
       .then((data) => {
         setTestimonials(data);

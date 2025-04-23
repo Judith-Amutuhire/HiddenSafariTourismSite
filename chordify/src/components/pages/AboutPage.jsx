@@ -9,6 +9,7 @@ export default function AboutPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [rawData, setRawData] = useState(null);
+  const URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const fetchAboutData = async () => {
@@ -16,7 +17,7 @@ export default function AboutPage() {
         setLoading(true);
         console.log("Fetching about us data...");
         
-        const response = await fetch('http://54.210.95.246:3005/api/v1/info/about-us');
+        const response = await fetch(`${URL}info/about-us`);
         
         if (!response.ok) {
           throw new Error(`Failed to fetch about us data: ${response.status}`);

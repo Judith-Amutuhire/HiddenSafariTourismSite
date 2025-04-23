@@ -1,24 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
-import * as images from "/src/assets";
 
 export default function EventsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+  const URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     const fetchEvents = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://54.210.95.246:3005/api/v1/events/all-events');
-        
+        const response = await fetch(`${URL}events/all-events`);
         if (!response.ok) {
           throw new Error('Failed to fetch events');
         }
-        
         const data = await response.json();
+        console.log("Fetched data:", data);
         setEvents(data.data || []);
       } catch (err) {
         setError(err.message);
@@ -27,7 +26,7 @@ export default function EventsPage() {
         setLoading(false);
       }
     };
-    
+
     fetchEvents();
   }, []);
 
@@ -35,14 +34,13 @@ export default function EventsPage() {
     setSearchQuery(e.target.value);
   };
 
-  // Filter events based on search query
-  const filteredEvents = events.filter(event => 
+  const filteredEvents = events.filter(event =>
     event.heading.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Orange header that extends across the page including navbar area */}
+      {/* Header */}
       <div className="w-full bg-orange-600 text-white pb-8">
         <div className="container mx-auto px-4 pt-20 pb-4">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -66,7 +64,7 @@ export default function EventsPage() {
         </div>
       </div>
 
-      {/* Main content */}
+      {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         {loading ? (
           <div className="text-center py-10">
@@ -75,8 +73,8 @@ export default function EventsPage() {
         ) : error ? (
           <div className="text-center py-10">
             <p className="text-xl text-red-600">Error: {error}</p>
-            <button 
-              onClick={() => window.location.reload()} 
+            <button
+              onClick={() => window.location.reload()}
               className="mt-4 px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700"
             >
               Try Again
@@ -84,33 +82,27 @@ export default function EventsPage() {
           </div>
         ) : (
           <>
-            {/* Safari Events Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mb-8">
               {filteredEvents.map((event) => (
                 <div key={event.id} className="rounded-lg overflow-hidden shadow-md border border-gray-200">
                   <div className="relative h-48 overflow-hidden">
-                    <img 
-                      src={event.bannerImages && event.bannerImages.length > 0 ? event.bannerImages[0] : '/api/placeholder/400/320'} 
+                    <img
+                      src={event.bannerImages1 || '/api/placeholder/400/320'}
                       alt={event.heading}
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        e.target.src = '/api/placeholder/400/320'; 
+                        e.target.src = '/api/placeholder/400/320';
                       }}
                     />
-                    <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1">
-                      {[1, 2, 3, 4, 5].map((dot) => (
-                        <div 
-                          key={dot} 
-                          className={`h-2 w-2 rounded-full ${dot === 1 ? 'bg-white' : 'bg-gray-400 bg-opacity-60'}`}
-                        />
-                      ))}
-                    </div>
                   </div>
                   <div className="p-4">
                     <h3 className="text-xl font-semibold text-gray-800 mb-2">{event.heading}</h3>
                     <div className="flex justify-between items-center">
                       <p className="text-gray-600">
-                        {event.eventDate ? `Date: ${new Date(event.eventDate).toLocaleDateString()}` : 'Date: TBA'}
+                        {event.calendarDates ||
+                          (event.eventDate
+                            ? `Date: ${new Date(event.eventDate).toLocaleDateString()}`
+                            : 'Date: TBA')}
                       </p>
                       <div className="flex items-center text-gray-600">
                         <span className="mr-2">
@@ -129,14 +121,12 @@ export default function EventsPage() {
               ))}
             </div>
 
-            {/* Show message if no events match the search */}
             {filteredEvents.length === 0 && (
               <div className="text-center py-10">
                 <p className="text-xl text-gray-600">No events found matching your search.</p>
               </div>
             )}
 
-            {/* Load More Button - Only show if there are events */}
             {filteredEvents.length > 0 && (
               <div className="flex justify-center mt-8">
                 <button className="text-orange-500 font-semibold text-lg hover:underline">

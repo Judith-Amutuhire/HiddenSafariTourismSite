@@ -4,6 +4,7 @@ export default function ContactPage() {
   const [offices, setOffices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const fetchContactData = async () => {
@@ -11,7 +12,7 @@ export default function ContactPage() {
         setLoading(true);
         console.log("Fetching contact data...");
         
-        const response = await fetch('http://54.210.95.246:3005/api/v1/contact');
+        const response = await fetch(`${URL}contact`);
         
         if (!response.ok) {
           throw new Error(`Failed to fetch contact data: ${response.status}`);

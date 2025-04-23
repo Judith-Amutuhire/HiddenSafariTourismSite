@@ -8,12 +8,13 @@ export default function PrivacyPolicyPage() {
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const fetchPrivacyPolicy = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://54.210.95.246:3005/api/v1/info/privacy-policy');
+        const response = await fetch(`${URL}info/privacy-policy`);
         
         if (!response.ok) {
           throw new Error(`Failed to fetch privacy policy: ${response.status}`);

@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 
 export default function TermsAndConditionsPage() {
   const [terms, setTerms] = useState({ title: '', sections: [] });
+  const URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch('http://54.210.95.246:3005/api/v1/info/terms-condition');
+        const res = await fetch(`${URL}info/terms-condition`);
         const data = await res.json();
 
         const content = data.content;

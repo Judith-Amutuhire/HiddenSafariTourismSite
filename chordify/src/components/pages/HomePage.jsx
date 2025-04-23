@@ -100,6 +100,25 @@ export default function HomePage() {
         console.error("Failed to fetch special events", err);
       });
   }, []);
+  // Monsoon Events
+  const [monsoonEvents, setMonsoonEvents] = useState([]);
+
+  useEffect(() => {
+    fetch(`${URL}events/monsoon-events`)
+      .then((res) => res.json())
+      .then((data) => {
+        const formatted = data.map((event, index) => ({
+          id: event.id || index,
+          title: event.heading || "Untitled",
+          location: event.heading || "Unknown",
+          image: event.bannerImages1 || images.kilimanjaro,
+        }));
+        setMonsoonEvents(formatted);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch monsoon events", err);
+      });
+  }, []);
   const [youTubeVideos, setYouTubeVideos] = useState([
     {
       id: 1,
@@ -187,6 +206,26 @@ export default function HomePage() {
           ))}
         </CardCarousel>
       </div>
+      {/* Monsoon Events */}
+      <div className="p-4 md:p-8">
+        <p className="text-xl md:text-2xl font-bold mb-2 md:mb-4">Monsoon Events</p>
+        <p className="text-xl md:text-sm mb-2 md:mb-4">
+          Experience the magic of monsoon
+        </p>
+        <CardCarousel>
+          {monsoonEvents.map((event) => (
+            <div key={event.id} className="flex-shrink-0 w-64 md:w-72">
+              <Card2
+                id={event.id}
+                image={event.image}
+                title={event.title}
+                location={event.location}
+              />
+            </div>
+          ))}
+        </CardCarousel>
+      </div>
+
 
       {/* Summer Events */}
       <div className="p-4 md:p-8">

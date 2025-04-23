@@ -1,27 +1,54 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Search } from 'lucide-react';
 
 export default function EventsPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [events, setEvents] = useState([]);
+  const [highlightedEvents, setHighlightedEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
+    const endpoints = [
+      'highlighted-events',
+      'snow-treks-event',
+      'summer-events',
+      'epic-adventure-events',
+      'special-events',
+      'monsoon-events'
+    ];
+
     const fetchEvents = async () => {
       try {
-        setLoading(true);
-        const response = await fetch(`${URL}events/all-events`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch events');
-        }
-        const data = await response.json();
-        console.log("Fetched data:", data);
-        setEvents(data.data || []);
+        const responses = await Promise.all(
+          endpoints.map((endpoint) =>
+            fetch(`${URL}events/${endpoint}`)
+              .then((res) => {
+                if (!res.ok) {
+                  throw new Error(`Failed to fetch ${endpoint}: ${res.status}`);
+                }
+                return res.json();
+              })
+              .catch((err) => {
+                console.error(`Fetch error for ${endpoint}:`, err);
+                return []; // return empty array on error so the rest continue
+              })
+          )
+        );
+
+        const allEvents = responses.flat().map((event, index) => ({
+          id: event.id || index,
+          heading: event.heading || 'Untitled',
+          location: event.heading || 'Unknown',
+          bannerImages1: event.bannerImages1 || '/api/placeholder/400/320',
+          calendarDates: event.calendarDates,
+          eventDate: event.eventDate,
+        }));
+
+        setHighlightedEvents(allEvents);
       } catch (err) {
-        setError(err.message);
-        console.error('Error fetching events:', err);
+        console.error('Unexpected fetch error:', err);
+        setError('Failed to fetch events. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -34,7 +61,7 @@ export default function EventsPage() {
     setSearchQuery(e.target.value);
   };
 
-  const filteredEvents = events.filter(event =>
+  const filteredEvents = highlightedEvents.filter((event) =>
     event.heading.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -72,7 +99,7 @@ export default function EventsPage() {
           </div>
         ) : error ? (
           <div className="text-center py-10">
-            <p className="text-xl text-red-600">Error: {error}</p>
+            <p className="text-xl text-red-600">{error}</p>
             <button
               onClick={() => window.location.reload()}
               className="mt-4 px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700"
@@ -87,7 +114,7 @@ export default function EventsPage() {
                 <div key={event.id} className="rounded-lg overflow-hidden shadow-md border border-gray-200">
                   <div className="relative h-48 overflow-hidden">
                     <img
-                      src={event.bannerImages1 || '/api/placeholder/400/320'}
+                      src={event.bannerImages1}
                       alt={event.heading}
                       className="w-full h-full object-cover"
                       onError={(e) => {
@@ -99,7 +126,7 @@ export default function EventsPage() {
                     <h3 className="text-xl font-semibold text-gray-800 mb-2">{event.heading}</h3>
                     <div className="flex justify-between items-center">
                       <p className="text-gray-600">
-                        {event.calendarDates ||
+                        {event.location ||
                           (event.eventDate
                             ? `Date: ${new Date(event.eventDate).toLocaleDateString()}`
                             : 'Date: TBA')}
@@ -113,7 +140,7 @@ export default function EventsPage() {
                             <line x1="3" y1="10" x2="21" y2="10"></line>
                           </svg>
                         </span>
-                        {event.location || 'Location TBA'}
+                        {event.calendarDates}
                       </div>
                     </div>
                   </div>

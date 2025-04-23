@@ -5,13 +5,14 @@ export default function TeamPage() {
   const [team, setTeam] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const fetchTeam = async () => {
       try {
         setLoading(true);
         // Direct API call without fallbacks
-        const response = await fetch('http://54.210.95.246:3005/api/v1/team');
+        const response = await fetch(`${URL}team`);
         
         if (!response.ok) {
           throw new Error('Failed to fetch team data');
@@ -36,7 +37,6 @@ export default function TeamPage() {
 
   return (
     <div className="team-page">
-      {/* Orange header section with title and subtitle */}
       <div className="bg-orange-500 text-white py-16">
         <div className="container mx-auto">
           <h1 className="text-4xl font-bold mb-4">Our Team</h1>

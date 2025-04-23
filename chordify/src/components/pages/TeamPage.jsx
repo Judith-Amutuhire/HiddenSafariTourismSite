@@ -30,11 +30,6 @@ export default function TeamPage() {
     fetchTeam();
   }, []);
 
-  // Function to get the corresponding image based on profileName
-  const getImage = (profileName) => {
-    return images[profileName] || images.milton;
-  };
-
   return (
     <div className="team-page">
       <div className="bg-orange-500 text-white py-16">
@@ -54,7 +49,7 @@ export default function TeamPage() {
             <div key={member.id} className="bg-white rounded-lg shadow-md overflow-hidden">
               {/* Image component */}
               <img 
-                src={getImage(member.profileName)} 
+                src={member.profileImage} 
                 alt={member.name}
                 className="w-full h-64 object-cover object-center"
               />
